@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import Todo from './Todo';
-import Calendar from './Calendar';
+import Calendar from './calendar';
 import { motion, spring } from 'motion/react';
 
 // Function to get today's date in YYYY-MM-DD format based on local time
@@ -271,9 +271,8 @@ function App() {
           </button>
         </div>
 
-        {/* Main Content Area */}
-        <div className="flex flex-col lg:flex-row items-center justify-center w-full gap-8 mt-8">
-          {/* Calendar Card */}
+        {/* Calendar Card - top left */}
+        <div className="absolute top-4 left-4 z-20">
           <Calendar
             selectedDate={selectedDate}
             setSelectedDate={setSelectedDate}
@@ -281,103 +280,103 @@ function App() {
             setShowCalendar={setShowCalendar}
             allTodos={allTodos}
           />
+        </div>
 
-          {/* Todo Card */}
-          <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md">
-            <Todo
-              selectedDate={selectedDate}
-              allTodos={allTodos}
-              setAllTodos={setAllTodos}
-            />
+        {/* Stopwatch Card - top right */}
+        <div className="absolute top-4 right-4 bg-[#ffeda8] p-3 sm:p-4 rounded-lg shadow-lg w-[90%] max-w-[280px] sm:max-w-xs md:max-w-sm lg:max-w-s z-10">
+          <div className="text-xl sm:text-2xl font-[docade] mb-2 text-center">
+            {(() => {
+              const t = formatTimeParts(displayTime);
+              return (
+                <span>
+                  {t.hours}h:{t.minutes}m:{t.seconds}s
+                </span>
+              );
+            })()}
           </div>
-
-          {/* Stopwatch Card */}
-          <div className="bg-[#ffeda8] p-3 sm:p-4 rounded-lg shadow-lg w-[90%] max-w-[280px] sm:max-w-xs md:max-w-sm lg:max-w-s z-10 lg:sticky lg:top-4">
-            <div className="text-xl sm:text-2xl font-[docade] mb-2 text-center">
-              {(() => {
-                const t = formatTimeParts(displayTime);
-                return (
-                  <span>
-                    {t.hours}h:{t.minutes}m:{t.seconds}s
-                  </span>
-                );
-              })()}
-            </div>
-            <div className="flex flex-wrap sm:flex-nowrap gap-1 sm:gap-2 mb-3 justify-center">
-              <button
-                onClick={startStopwatch}
-                className={`px-2 sm:px-3 py-1 rounded text-sm sm:text-base cursor-pointer font-[docade] ${
-                  isRunning ? 'bg-gray-300' : 'bg-[#1e7637] text-white'
-                }`}
-                disabled={isRunning}
-              >
-                Start
-              </button>
-              <button
-                onClick={pauseStopwatch}
-                className={`px-2 sm:px-3 py-1 rounded text-sm sm:text-base cursor-pointer font-[docade] ${
-                  !isRunning ? 'bg-gray-300' : 'bg-yellow-500 text-white'
-                }`}
-                disabled={!isRunning}
-              >
-                Pause
-              </button>
-              <button
-                onClick={resetStopwatch}
-                className="px-2 sm:px-3 py-1 font-[docade] rounded text-sm sm:text-base bg-red-500 text-white cursor-pointer"
-              >
-                Reset
-              </button>
-            </div>
-            {/* Break history - responsive */}
-            {breaks.length > 0 && (
-              <div className="mt-2 border-t pt-2">
-                <h3 className="text-2xl sm:text-md font-semibold mb-1 font-[bright]">
-                  Breaks:
-                </h3>
-                <div className="max-h-32 sm:max-h-40 overflow-y-auto">
-                  {breaks.map((breakItem, idx) => {
-                    let duration = breakItem.rawTime;
-                    if (idx > 0) {
-                      duration = breakItem.rawTime - breaks[idx - 1].rawTime;
-                    }
-                    const formatDuration = (ms) => {
-                      const hours = Math.floor(ms / 3600000);
-                      const minutes = Math.floor((ms % 3600000) / 60000);
-                      const seconds = Math.floor((ms % 60000) / 1000);
-                      const milliseconds = Math.floor((ms % 1000) / 10);
-                      return (
-                        `${hours.toString().padStart(2, '0')}:${minutes
-                          .toString()
-                          .padStart(2, '0')}:${seconds
-                          .toString()
-                          .padStart(2, '0')}.` +
-                        `<span class="text-xs align-top ml-1">${milliseconds
-                          .toString()
-                          .padStart(2, '0')}</span>`
-                      );
-                    };
+          <div className="flex flex-wrap sm:flex-nowrap gap-1 sm:gap-2 mb-3 justify-center">
+            <button
+              onClick={startStopwatch}
+              className={`px-2 sm:px-3 py-1 rounded text-sm sm:text-base cursor-pointer font-[docade] ${
+                isRunning ? 'bg-gray-300' : 'bg-[#1e7637] text-white'
+              }`}
+              disabled={isRunning}
+            >
+              Start
+            </button>
+            <button
+              onClick={pauseStopwatch}
+              className={`px-2 sm:px-3 py-1 rounded text-sm sm:text-base cursor-pointer font-[docade] ${
+                !isRunning ? 'bg-gray-300' : 'bg-yellow-500 text-white'
+              }`}
+              disabled={!isRunning}
+            >
+              Pause
+            </button>
+            <button
+              onClick={resetStopwatch}
+              className="px-2 sm:px-3 py-1 font-[docade] rounded text-sm sm:text-base bg-red-500 text-white cursor-pointer"
+            >
+              Reset
+            </button>
+          </div>
+          {/* Break history - responsive */}
+          {breaks.length > 0 && (
+            <div className="mt-2 border-t pt-2">
+              <h3 className="text-2xl sm:text-md font-semibold mb-1 font-[bright]">
+                Breaks:
+              </h3>
+              <div className="max-h-32 sm:max-h-40 overflow-y-auto">
+                {breaks.map((breakItem, idx) => {
+                  let duration = breakItem.rawTime;
+                  if (idx > 0) {
+                    duration = breakItem.rawTime - breaks[idx - 1].rawTime;
+                  }
+                  const formatDuration = (ms) => {
+                    const hours = Math.floor(ms / 3600000);
+                    const minutes = Math.floor((ms % 3600000) / 60000);
+                    const seconds = Math.floor((ms % 60000) / 1000);
+                    const milliseconds = Math.floor((ms % 1000) / 10);
                     return (
-                      <div
-                        key={breakItem.id}
-                        className="font-[bright] sm:text-md mb-1 flex flex-wrap sm:flex-nowrap"
-                      >
-                        <span className="text-lg font-[bright]">
-                          Break {breakItem.id}:
-                        </span>
-                        <span className="ml-1 text-lg">
-                          {formatDurationPlain(breakItem.rawTime)}
-                        </span>
-                        <span className="ml-2 text-lg text-gray-500">
-                          (Session: {formatDurationPlain(duration)})
-                        </span>
-                      </div>
+                      `${hours.toString().padStart(2, '0')}:${minutes
+                        .toString()
+                        .padStart(2, '0')}:${seconds
+                        .toString()
+                        .padStart(2, '0')}.` +
+                      `<span class="text-xs align-top ml-1">${milliseconds
+                        .toString()
+                        .padStart(2, '0')}</span>`
                     );
-                  })}
-                </div>
+                  };
+                  return (
+                    <div
+                      key={breakItem.id}
+                      className="font-[bright] sm:text-md mb-1 flex flex-wrap sm:flex-nowrap"
+                    >
+                      <span className="text-lg font-[bright]">
+                        Break {breakItem.id}:
+                      </span>
+                      <span className="ml-1 text-lg">
+                        {formatDurationPlain(breakItem.rawTime)}
+                      </span>
+                      <span className="ml-2 text-lg text-gray-500">
+                        (Session: {formatDurationPlain(duration)})
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
-            )}
-          </div>
+            </div>
+          )}
+        </div>
+
+        {/* Todo Card is not absolutely positioned to remain in the flow */}
+        <div className="mt-48 relative w-full max-w-xs sm:max-w-sm md:max-w-md">
+          <Todo
+            selectedDate={selectedDate}
+            allTodos={allTodos}
+            setAllTodos={setAllTodos}
+          />
         </div>
       </div>
     </>
