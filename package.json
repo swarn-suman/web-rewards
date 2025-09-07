@@ -21,6 +21,7 @@
     "motion": "^12.23.12",
     "react": "^19.1.0",
     "react-awesome-reveal": "^4.3.1",
+    "react-calendar": "^6.0.0",
     "react-dom": "^19.1.0",
     "react-vivus": "^0.0.2",
     "tailwindcss": "^4.1.11",

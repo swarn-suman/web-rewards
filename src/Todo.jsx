@@ -1,49 +1,51 @@
-import { useState, useEffect } from "react";
+import { useState } from 'react';
 import {
   DndContext,
   closestCenter,
   PointerSensor,
   useSensor,
   useSensors,
-} from "@dnd-kit/core";
+} from '@dnd-kit/core';
 import {
   arrayMove,
   SortableContext,
   useSortable,
   verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
-function Todo() {
-  const [todos, setTodos] = useState(() => {
-    const saved = localStorage.getItem("todos");
-    return saved ? JSON.parse(saved) : [];
-  });
-  const [input, setInput] = useState("");
+function Todo({ selectedDate, allTodos, setAllTodos }) {
+  const [input, setInput] = useState('');
   const [editId, setEditId] = useState(null);
-  const [editValue, setEditValue] = useState("");
-  const [showModal, setShowModal] = useState(false);
+  const [editValue, setEditValue] = useState('');
 
-  useEffect(() => {
-    localStorage.setItem("todos", JSON.stringify(todos));
-  }, [todos]);
+  // Get the todos for the selected date, or an empty array if none exist
+  const todosForDate = allTodos[selectedDate] || [];
+
+  const updateTodos = (newTodos) => {
+    setAllTodos((prevAllTodos) => ({
+      ...prevAllTodos,
+      [selectedDate]: newTodos,
+    }));
+  };
 
   const addTodo = () => {
-    if (input.trim() === "") return;
-    setTodos([...todos, { id: Date.now(), text: input, completed: false }]);
-    setInput("");
+    if (input.trim() === '') return;
+    const newTodo = { id: Date.now(), text: input, completed: false };
+    updateTodos([...todosForDate, newTodo]);
+    setInput('');
   };
 
   const deleteTodo = (id) => {
-    setTodos(todos.filter((todo) => todo.id !== id));
+    const newTodos = todosForDate.filter((todo) => todo.id !== id);
+    updateTodos(newTodos);
   };
 
   const toggleTodo = (id) => {
-    setTodos(
-      todos.map((todo) =>
-        todo.id === id ? { ...todo, completed: !todo.completed } : todo
-      )
+    const newTodos = todosForDate.map((todo) =>
+      todo.id === id ? { ...todo, completed: !todo.completed } : todo,
     );
+    updateTodos(newTodos);
   };
 
   const startEdit = (id, text) => {
@@ -52,17 +54,16 @@ function Todo() {
   };
 
   const saveEdit = (id) => {
-    setTodos(
-      todos.map((todo) =>
-        todo.id === id ? { ...todo, text: editValue } : todo
-      )
+    const newTodos = todosForDate.map((todo) =>
+      todo.id === id ? { ...todo, text: editValue } : todo,
     );
+    updateTodos(newTodos);
     setEditId(null);
-    setEditValue("");
+    setEditValue('');
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       addTodo();
     }
   };
@@ -71,7 +72,7 @@ function Todo() {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: { delay: 15, tolerance: 5 },
-    })
+    }),
   );
 
   function SortableItem({
@@ -127,7 +128,7 @@ function Todo() {
               onChange={(e) => setEditValue(e.target.value)}
               onBlur={() => saveEdit(todo.id)}
               onKeyDown={(e) => {
-                if (e.key === "Enter") saveEdit(todo.id);
+                if (e.key === 'Enter') saveEdit(todo.id);
               }}
               autoFocus
             />
@@ -142,7 +143,7 @@ function Todo() {
           <>
             <span
               className={`flex-1 text-lg font-[bright] cursor-pointer ${
-                todo.completed ? "line-through text-gray-800" : "text-gray-800"
+                todo.completed ? 'line-through text-gray-800' : 'text-gray-800'
               }`}
               onDoubleClick={() => startEdit(todo.id, todo.text)}
               title="Double click to edit"
@@ -169,11 +170,13 @@ function Todo() {
     );
   }
 
-  // The Todo Card UI
-  const todoCard = (
-    <div className="w-[100%] max-w-xs sm:max-w-sm md:max-w-md bg-[#ffeda8] rounded-lg shadow-lg p-4 flex flex-col gap-2">
+  return (
+    <div className="w-[100%] bg-[#ffeda8] rounded-lg shadow-lg p-4 flex flex-col gap-2">
       <h2 className="text-lg font-bold mb-2 text-[#003631] font-[docade]">
-        Daily Todos
+        Todos for{' '}
+        <span className="text-xl font-bold font-[bright]">
+          {new Date(selectedDate + 'T00:00:00').toLocaleDateString()}
+        </span>
       </h2>
       <div className="flex gap-2 mb-2">
         <input
@@ -198,23 +201,24 @@ function Todo() {
         onDragEnd={({ active, over }) => {
           if (!over) return;
           if (active.id !== over.id) {
-            const oldIndex = todos.findIndex((t) => t.id === active.id);
-            const newIndex = todos.findIndex((t) => t.id === over.id);
-            setTodos((items) => arrayMove(items, oldIndex, newIndex)); // reorders list
+            const oldIndex = todosForDate.findIndex((t) => t.id === active.id);
+            const newIndex = todosForDate.findIndex((t) => t.id === over.id);
+            const newTodos = arrayMove(todosForDate, oldIndex, newIndex);
+            updateTodos(newTodos);
           }
         }}
       >
         <SortableContext
-          items={todos.map((t) => t.id)}
+          items={todosForDate.map((t) => t.id)}
           strategy={verticalListSortingStrategy}
         >
           <ul className="flex flex-col gap-2 max-h-64 overflow-y-auto">
-            {todos.length === 0 && (
+            {todosForDate.length === 0 && (
               <li className="text-[#29504a] text-lg text-center font-medium font-[bright]">
-                No todos yet!
+                No todos for this date!
               </li>
             )}
-            {todos.map((todo) => (
+            {todosForDate.map((todo) => (
               <SortableItem
                 key={todo.id}
                 todo={todo}
@@ -231,44 +235,6 @@ function Todo() {
         </SortableContext>
       </DndContext>
     </div>
-  );
-
-  return (
-    <>
-      {/* For small screens: show floating + button, open modal */}
-      <div className="sm:hidden fixed left-4 bottom-4 z-30">
-        <button
-          className="bg-[#ffeda8] text-[#003631] w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-3xl font-bold focus:outline-none focus:ring-2 focus:ring-blue-400 hover:bg-blue-700 transition-all duration-150 p-0"
-          onClick={() => setShowModal(true)}
-          aria-label="Open Todo Modal"
-        >
-          <span
-            className="flex items-center justify-center w-full h-full"
-            style={{ lineHeight: 1 }}
-          >
-            +
-          </span>
-        </button>
-        {showModal && (
-          <div className="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-40">
-            <div className="relative w-[90%] max-w-xs sm:max-w-sm md:max-w-md">
-              <button
-                className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-2xl font-bold z-50"
-                onClick={() => setShowModal(false)}
-                aria-label="Close Todo Modal"
-              >
-                &times;
-              </button>
-              <div className="mt-6">{todoCard}</div>
-            </div>
-          </div>
-        )}
-      </div>
-      {/* For screens sm and up: show card always */}
-      <div className="hidden sm:block fixed left-4 bottom-4 z-20 lg:left-8 lg:bottom-8">
-        {todoCard}
-      </div>
-    </>
   );
 }
 
