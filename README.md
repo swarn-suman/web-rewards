@@ -63,6 +63,7 @@ rewards/
 ├── src/
 │   ├── App.jsx       # Main app component
 │   ├── main.jsx      # Entry point
+│   ├── calendar.jsx  #Calendar functions
 │   ├── index.css     # Tailwind CSS import
 │   └── assets/       # Images, icons
 ├── index.html        # HTML template
