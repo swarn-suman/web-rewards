@@ -1,6 +1,6 @@
 # Draw Your Reward
 
-A simple, fun web app to help you decide what to do during your break! 🎲
+A simple, fun web Todo app to help you decide what to do during your break! 🎲
 
 This project solves the problem of indecision by letting you draw a random reward activity—like watching YouTube, reading a book, or just doing nothing—at the click of a button.
 
