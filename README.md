@@ -65,7 +65,7 @@ rewards/
 │   ├── main.jsx      # Entry point
 │   ├── calendar.jsx  #Calendar functions
 │   ├── index.css     # Tailwind CSS import
-│   └── assets/       # Images, icons
+│   └── assets/       # Images, Icons
 ├── index.html        # HTML template
 ├── package.json      # Project metadata & scripts
 └── README.md         # This file
