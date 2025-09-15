@@ -41,7 +41,7 @@ This project solves the problem of indecision by letting you draw a random rewar
 
 ## Usage
 
-- Click the **Draw** button to randomly select a reward for your break.
+- Click on the **Draw** button to randomly select a reward for your break.
 - The selected reward will be displayed in a card.
 - Click **Reset** to clear the result and draw again.
 
