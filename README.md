@@ -1,4 +1,4 @@
-# Draw Your Reward
+# Web Todo & Reward
 
 A simple, fun web Todo app to help you decide what to do during your break! 🎲
 
